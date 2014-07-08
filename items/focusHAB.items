@@ -1,0 +1,72 @@
+Group All
+Group Netatmo (All)
+Group Netatmo_Winti (Netatmo)
+Group HueLights (All)
+Group Hue_OnOff (HueLights)
+Group Hue_Color (HueLights)
+
+
+Group Network (All)
+Group Bluetooth (Network)
+Group Fing (Network)
+Group NetworkHealth (Network)
+
+Group TestCases(All)
+
+
+/* Netatmo Wetterstation
+ * 
+ * Device ID Winti:					70:ee:50:00:21:92
+ * Module ID Outdoor Winti:			02:00:00:00:23:38
+ * 
+ * Device ID Klosters:				70:ee:50:01:cc:c0
+ * Module ID Outdoor Klosters:		02:00:00:01:c6:9a
+ * 
+ * Indoor Module: Temperature, Humidity, Co2, Pressure and Noise.
+ * 
+ * */
+Number Netatmo_Winti_Indoor_CO2 "Carbon dioxide [%d ppm]" (Netatmo_Winti) {netatmo="70:ee:50:00:21:92#Co2"}
+Number Netatmo_Winti_Indoor_Temperature "Temperature [%.1f °C]" <temperature> (Netatmo_Winti) {netatmo="70:ee:50:00:21:92#Temperature"}
+Number Netatmo_Winti_Indoor_Humidity "Humidity [%d %%]" <sun> (Netatmo_Winti) {netatmo="70:ee:50:00:21:92#Humidity"}
+Number Netatmo_Winti_Indoor_Pressure "Pressure [%.1f mb]" (Netatmo_Winti) {netatmo="70:ee:50:00:21:92#Pressure"}
+Number Netatmo_Winti_Indoor_Noise "Noise [%.1f db]" (Netatmo_Winti) {netatmo="70:ee:50:00:21:92#Noise"}
+
+/* HUE Lights */
+Switch Hue_OnOff_1   "Hue 1"   (Hue_OnOff) {hue="1"}
+Switch Hue_OnOff_2   "Hue 2"   (Hue_OnOff) {hue="2"} 
+Switch Hue_OnOff_3   "Hue 3"   (Hue_OnOff) {hue="3"}
+
+
+Color Hue_Color_1 "Color Hue 1"   (HueColor) {hue="1"}
+Color Hue_Color_2 "Color Hue 2"   (HueColor) {hue="2"}
+Color Hue_Color_3 "Color Hue 3"   (HueColor) {hue="3"}
+
+Dimmer Hue_Dimmer_Brightness_1 "Brightness Hue 1"   (Hue_Color) {hue="1;brightness;10"}
+Dimmer Hue_Dimmer_ColTemp_1 "ColTemp Hue 1"   (Hue_Color) {hue="1;colorTemperature;100"}
+
+Number Lamp_Scene			"Scene"					<sofa>
+
+/* Fing */
+Number Fing_NumHosts "Fing Num Host on Net [%d]" (Fing) {exec="<[./exec-scripts/exec-fing.sh:6000:REGEX((.*?))]"}
+
+/* Mail Test */
+Switch Mail_Test "Mail Test" (TestCases)
+Switch Twitter_Test "Twitter Test" (TestCases)
+
+/* XBMC */
+String XbmcLiving_State "Living State [%s]" { xbmc="<[#livingRoom|Player.State]" }
+String XbmcLiving_Title "Living Title [%s]" { xbmc="<[#livingRoom|Player.Title]" }
+String XbmcLiving_ShowTitle "Living Show [%s]" { xbmc="<[#livingRoom|Player.ShowTitle]" }
+Switch XbmcLiving_PlayPause "Living Play/Pause" { xbmc=">[#livingRoom|Player.PlayPause]", autoupdate="false" }
+Switch XbmcLiving_Stop "Living Stop" { xbmc=">[#livingRoom|Player.Stop]", autoupdate="false" }
+String XbmcLiving_Notify "Living Notify [%s]" { xbmc="<[#livingRoom|GUI.ShowNotification]", autoupdate="false" }
+
+/* Voice Control */
+String VoiceCommand
+
+/* Wetter Vorhersage */
+String w   "Today [%s]" <w>  { http="<[http://api.wunderground.com/api/283fe7b137b14c14/forecast/q/Luxembourg/Luxembourg.xml:3600000:XSLT(wunderground_icon_forecast.xsl)]"} 
+
+/* Network Health */
+Switch NetworkHealth_OwnersDevice "Owners Device"   (NetworkHealth)   { nh="192.168.1.103" }
+String DeviceOwner "Device Owner"

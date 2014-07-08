@@ -1,0 +1,15 @@
+var int i=0
+
+playSound("party.mp3")
+
+while(i!=100)
+{
+	i = i + 1;
+        
+    Hue_Color_1.sendCommand((Math::random*254) + ",100,100")
+    Hue_Color_2.sendCommand((Math::random*254) + ",100,100")
+    Hue_Color_3.sendCommand((Math::random*254) + ",100,100")
+    Thread::sleep(20)
+}
+Thread::sleep(100)
+playStream(null)

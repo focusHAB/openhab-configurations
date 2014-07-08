@@ -1,0 +1,57 @@
+sitemap focusHab_fertig label="focusHab Fertig"
+{
+	
+	Frame label="Test Cases" {
+		Switch item=Mail_Test label="Send Test Mail"
+		Switch item=Twitter_Test label="Send Test Twitter Message"
+		Text item=w
+	}
+	Frame label="Exec" {
+		Text item=Fing_NumHosts
+	}
+	
+	Frame label="Network Health" {
+		Switch item=NetworkHealth_OwnersDevice label="Owners Devices is on Network"
+	}
+	
+	Frame label="Netatmo Stations" {
+		Text label="Winterthur" icon="netatmo"{
+			Frame label="Outdoor" {
+				Text item=Netatmo_Winti_Outdoor_Temperature
+				Text item=Netatmo_Winti_Outdoor_Humidity
+			}
+			Frame label="Indoor" {
+				Text item=Netatmo_Winti_Indoor_Temperature
+				Text item=Netatmo_Winti_Indoor_Humidity
+				Text item=Netatmo_Winti_Indoor_CO2
+				Text item=Netatmo_Winti_Indoor_Noise
+				Text item=Netatmo_Winti_Indoor_Pressure
+			}
+		}
+	}
+ 	
+	Frame label="Hue Lights" {
+		Switch item=Hue_OnOff label="Alle Lampen"
+		Switch item=Hue_OnOff_1 
+		Switch item=Hue_OnOff_2 
+		Switch item=Hue_OnOff_3 
+		
+		Colorpicker item=Hue_Color_2 icon="slider"
+		Slider item=Hue_Dimmer_Brightness_1 label="Dimm Brightness Hue 1"
+		Slider item=Hue_Dimmer_ColTemp_1 label="Dimm Col Temp Hue 1"
+		Selection item=Lamp_Scene label="Szenen Auswahl" mappings=[0=off, 1=AXA, 2=Television]
+	}
+	
+	Frame label="XBMC" {
+		Text label="Wohnzimmer" {
+			 Text item=XbmcLiving_State label="State [%s]"
+			 Text item=XbmcLiving_Title label="Title [%s]" visibility=[XbmcLiving_State==Play, XbmcLiving_State==Pause]
+			 Text item=XbmcLiving_ShowTitle label="Show [%s]" visibility=[XbmcLiving_State==Play, XbmcLiving_State==Pause]
+			 Switch item=XbmcLiving_PlayPause label="Play" icon="play" mappings=[ON="Play"] visibility=[XbmcLiving_State==Pause]
+			 Switch item=XbmcLiving_PlayPause label="Pause" icon="pause" mappings=[ON="Pause"] visibility=[XbmcLiving_State==Play]
+			 Switch item=XbmcLiving_Stop label="Stop" mappings=[ON="Stop"] visibility=[XbmcLiving_State==Play, XbmcLiving_State==Pause]
+		}
+	}
+
+
+}

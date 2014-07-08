@@ -1,0 +1,11 @@
+var int i=0
+playSound("error.mp3")
+while(i!=3){
+	Hue_OnOff.sendCommand(OFF)
+	Hue_Color_1.sendCommand ("0,100,100") 
+	Hue_Color_2.sendCommand ("0,100,100") 
+	Hue_Color_3.sendCommand ("0,100,100")
+	Hue_OnOff.sendCommand(OFF)
+	Thread::sleep(700)
+	i = i + 1
+}

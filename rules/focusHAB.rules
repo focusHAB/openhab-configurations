@@ -1,0 +1,205 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.library.items.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import org.openhab.library.tel.types.CallType
+
+rule StartUp
+when System started
+then 
+	sendCommand(DeviceOwner, "David")
+end
+
+rule Netatmo_Noise_Hue_3
+when
+	Item Netatmo_Winti_Indoor_Noise changed
+then
+/* 	var HSBType col = Hue_Color_StehlampeUnten.state as HSBType*/
+/*	sendCommand(Hue_Color_GangUnten,col)*/
+	var String colorString = Netatmo_Winti_Indoor_Noise.state +",90.0,100"
+	logInfo("**** Rule Netatmo_Noise_Hue_3", colorString)
+	sendCommand(Hue_Color_3, colorString)
+end
+
+rule SendMailTest
+  when Item Mail_Test received update ON
+then
+  var String mailSubject = "Mail Test" + now
+  logInfo("**** Send Mail Test", mailSubject)
+  sendMail( "david@davidulrich.ch" , mailSubject , "Mail Test");
+end
+
+rule TwitterTest
+  when Item Twitter_Test received update ON
+then
+  var String tweetMsg = "Tweet Test" + now
+  logInfo("**** Tweet Test", tweetMsg)
+  sendTweet(tweetMsg)
+end
+
+ rule VoiceControl
+ when
+    Item VoiceCommand received command
+ then
+ 	val String[] hueCommand = receivedCommand.toString.lowerCase.split
+ 	
+ 	 if(hueCommand.size()<=2 && hueCommand.get(0)!="party" && hueCommand.get(0)!="lampen" )
+ 	{
+ 		callScript("error")
+ 	}
+ 	else{
+ 	
+ 		switch(hueCommand.get(0))
+ 		{
+ 			case "lampe": 
+ 						{
+ 							val hue = switch(hueCommand.get(2)) {
+       						case "blau"    	: 240
+     						case "magenta"	: 300
+   						   	case "grün"    	: 120
+     				    	case "gelb"		: 70
+     					    default: callScript("error")
+    					}
+    					switch(hueCommand.get(1))
+    					{
+    						case "1" : Hue_Color_1.sendCommand(hue + ",100,100")
+    						case "2" : Hue_Color_2.sendCommand(hue + ",100,100")
+    						case "3" : Hue_Color_3.sendCommand(hue + ",100,100")
+    						default: callScript("error")
+    					}
+ 					}
+ 			case "party": callScript("party") 
+ 			case "lampen":{
+ 							switch(hueCommand.get(1))
+    						{
+    							case "an" : Hue_OnOff.sendCommand(ON)
+    							case "aus" : Hue_OnOff.sendCommand(OFF)
+
+    							default: callScript("error")
+    						}
+    					
+    					}
+ 				   
+ 			default: callScript("error")
+ 		
+ 		}
+ 	}
+ 	
+
+ end
+
+rule NeueNetzwerkDinge
+	when Item Fing_NumHosts changed
+then 
+	
+	//var String farb2 = Hue_Color_2.state.toString
+	
+	var states = storeStates(Hue_Color_2)
+
+	var String netzzahl = Fing_NumHosts.state.toString
+	//logInfo("***** Farbe vorhher", farb2)
+	
+	sendCommand(Hue_Color_2, "240,100,100") 
+	logInfo("***** Fing Number", netzzahl)
+
+	//logInfo("***** Farbe nach blau", farb2.toString)
+	Thread::sleep(2000)
+	
+	//sendCommand(Hue_Color_2, farb2)
+	
+	restoreStates(states)
+	
+	
+
+end	
+
+rule "Light scene"
+	when
+		Item Lamp_Scene received command
+	then
+		switch(receivedCommand) {
+			case 0 : sendCommand(Hue_OnOff, OFF)
+			case 1 : {
+				sendCommand(Hue_OnOff, ON);
+				sendCommand(Hue_Color_1, "240,100,100");
+				sendCommand(Hue_Color_2, "0,100,100");
+				sendCommand(Hue_Color_3, "240,100,100");
+				}
+			case 2 : {
+				sendCommand(Hue_OnOff, ON);
+				sendCommand(Hue_Color_1, "60,100,10");
+				sendCommand(Hue_Color_2, "60,100,10");
+				sendCommand(Hue_Color_3, "60,100,10");
+				}
+		}
+end
+
+rule "Adjust living room lighting when XBMC starts/stops"
+when
+    Item XbmcLiving_State changed
+then
+    var String state = XbmcLiving_State.state.toString()
+    
+    switch (state.lowerCase) {
+		case "play"  : Hue_OnOff.send(OFF)
+		case "pause" : Hue_OnOff.send(ON)
+		case "stop"  : Hue_OnOff.send(ON)
+ 	}
+end
+
+rule XMBC_Title_Changed
+when
+	Item XMBC_Player_Title changed 
+then
+	say("Now playing item" + XMBC_Player_Title)
+end
+
+//rule OwnersDeviceOnNetwork
+//when 
+//	Item NetworkHealth_OwnersDevice received update ON
+//then
+//	if (XbmcLiving_State.state != "Play") {
+//		var String msg = DeviceOwner.state + " hat den Raum betreten..."
+//		logInfo("Rule OwnersDeviceOnNetwork", msg)
+//		
+//		//Lampen an
+//		sendCommand(HueLights, ON)
+//		
+//		Thread::sleep(2000)
+//		
+//		say("Hello Again, What about music?")
+//		
+//		Thread::sleep(1000)
+//		
+//		sendXbmcNotification("localhost",8081, "XBMC Aktivierung!", msg)
+//		sendCommand(XbmcLiving_PlayPause, ON)
+//	} else {
+//		logInfo("Rule OwnersDeviceOnNetwork", "state war play *************" + XMBC_Player_State.state)
+//	}
+//	
+//end
+
+/*
+ * Player.Open 
+ * jsonrpc?{"jsonrpc":"2.0","method":"Player.Open","id":1} 
+ * 
+ */
+/*
+rule OwnersDeviceOffNetwork
+when
+	Item NetworkHealth_OwnersDevice received update OFF
+then
+	if (XbmcLiving_State.state == "Play") {
+		var String msg = DeviceOwner.state + " hat den Raum verlassen..."
+		logInfo("Rule OwnersDeviceOffNetwork", msg)
+		sendXbmcNotification("localhost",8081, "XBMC Deaktivierung!", msg)
+		sendCommand(XbmcLiving_Stop, ON)
+		
+		//Lampen an
+		sendCommand(HueLights, OFF)
+
+	} else {
+		logInfo("Rule OwnersDeviceOffNetwork", "state war nicht play *************" +XbmcLiving_State.state)
+	}
+end
+*  */

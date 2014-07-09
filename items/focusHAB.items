@@ -47,7 +47,7 @@ Dimmer Hue_Dimmer_ColTemp_1 "ColTemp Hue 1"   (Hue_Color) {hue="1;colorTemperatu
 Number Lamp_Scene			"Scene"					<sofa>
 
 /* Fing */
-Number Fing_NumHosts "Fing Num Host on Net [%d]" (Fing) {exec="<[./exec-scripts/exec-fing.sh:6000:REGEX((.*?))]"}
+Number Fing_NumHosts "Fing Num Host on Net [%d]" (Fing) {exec="<[command -v fing >/dev/null 2>&1 && sudo fing -r 1 -o log,text --silent | grep Address: | wc -l:6000:REGEX((.*?))]"}
 
 /* Mail Test */
 Switch Mail_Test "Mail Test" (TestCases)
